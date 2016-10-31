@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.servlet.ServletException;
@@ -22,23 +23,30 @@ public class ValidateLogin extends HttpServlet {
         String user=request.getParameter("username").trim();
         String pass=request.getParameter("password").trim();
         
+        
         try
              {
                  Connection con=new DBConnect().connect(getServletContext().getRealPath("/WEB-INF/config.properties"));
-                    if(con!=null && !con.isClosed())
+                 if(con!=null && !con.isClosed())
                                {
                                    ResultSet rs=null;
-                                   Statement stmt = con.createStatement();  
-                                   rs=stmt.executeQuery("select * from users where name='"+user+"' and password='"+pass+"'");
+                                   Statement stmt = con.createStatement(); 
+                                   PreparedStatement pst = con.prepareStatement("select * from users where name=? and password=?");
+                                   //rs=stmt.executeQuery("select * from users where name='"+user+"' and password='"+pass+"'");
+                                   pst.setString(1, user);
+                                   pst.setString(2, pass);
+                                   pst.executeQuery();
                                    if(rs != null && rs.next()){
                                        response.sendRedirect("members.jsp");
+                                   } else {
+                                       response.sendRedirect("login.jsp");
                                    }
                                     
                                }
                 }
                catch(Exception ex)
                 {
-                           response.sendRedirect("login.jsp?err=something went wrong");
+                           response.sendRedirect("login.jsp?err=something went wrong "+ex.toString());
                  }
         
         

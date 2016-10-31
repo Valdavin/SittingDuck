@@ -1,0 +1,10 @@
+Login :
+
+put the pass non visible
+sql injection
+brutforce ?
+no SHA-1 !!!
+
+Database : P
+
+not encrypted

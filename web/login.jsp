@@ -11,6 +11,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Sitting Ducks</title>
 <link href="style.css" rel="stylesheet" type="text/css" />
+ <script src="sha256.js"></script> 
 </head>
 <%
     String username = "";
@@ -43,10 +44,10 @@
 <div id="content">
 
     <h1>Login</h1>
-    <form action="ValidateLogin" method="post">
+    <form action="ValidateLogin" method="post" onsubmit="hashPwd()">
             <table> 
-                <tr><td>UserName: </td><td><input type="text" name="username" value="<%=username%>" /></td></tr>
-                <tr><td>Password :</td><td><input type="text" name="password" value="<%=password%>"/></td></tr>
+                <tr><td>UserName: </td><td><input id="username" type="text" name="username" value="<%=username%>" /></td></tr>
+                <tr><td>Password :</td><td><input id="password" type="password" name="password" value="<%=password%>"/></td></tr>
                 <tr><td><input type="submit" name="Login" value="Login"/></td></tr>
             </table>  
         </form>
@@ -57,6 +58,17 @@
         Copyright © 2016 | Sitting Ducks
 
 </div>
+<script>
+    function hashPwd() {
+        var pass = document.getElementById("password").value;
+        var shaObj = new jsSHA("SHA-256", "TEXT");
+        shaObj.update(pass);
+        var hash = shaObj.getHash("HEX");
+        document.getElementById("password").value = hash;
+    }
+    
+
+</script>
 
 
 
