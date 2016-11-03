@@ -3,7 +3,8 @@
     Created on : Oct 17, 2016, 8:46:14 PM
     Author     : Stephen
 --%>
-
+<%@ page import="net.tanesha.recaptcha.ReCaptcha" %>
+<%@ page import="net.tanesha.recaptcha.ReCaptchaFactory" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -47,9 +48,15 @@
     <form action="ValidateLogin" method="post" onsubmit="hashPwd()">
             <table> 
                 <tr><td>UserName: </td><td><input id="username" type="text" name="username" value="<%=username%>" /></td></tr>
-                <tr><td>Password :</td><td><input id="password" type="password" name="password" value="<%=password%>"/></td></tr>
+                <tr><td>Password :</td><td><input id="pass" type="password" name="pass" value="<%=password%>"/></td></tr>
+                <tr><td></td><td><input hidden id="password" type="password" name="password" value="<%=password%>"/></td></tr>
+                <%
+                    ReCaptcha c = ReCaptchaFactory.newReCaptcha("6LeuvgoUAAAAAFYnMdNx12jn-LLZg-Gcot7IvGhJ", "6LeuvgoUAAAAAN_mo_6pCqKbOMdOOlHyTOI2Jbl1", false);
+                    out.print(c.createRecaptchaHtml(null, null));
+                %>
                 <tr><td><input type="submit" name="Login" value="Login"/></td></tr>
-            </table>  
+            </table>
+                
         </form>
 </div>
 <div id="footer">
@@ -60,11 +67,12 @@
 </div>
 <script>
     function hashPwd() {
-        var pass = document.getElementById("password").value;
+        var pass = document.getElementById("pass").value;
         var shaObj = new jsSHA("SHA-256", "TEXT");
         shaObj.update(pass);
         var hash = shaObj.getHash("HEX");
         document.getElementById("password").value = hash;
+        document.getElementById("pass").value = '';
     }
     
 
@@ -75,6 +83,6 @@
 </div>
 
 </body>
-
+<script src='https://www.google.com/recaptcha/api.js'></script>
 </html>
 

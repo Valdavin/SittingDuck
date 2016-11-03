@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import net.tanesha.recaptcha.ReCaptcha;
+import net.tanesha.recaptcha.ReCaptchaFactory;
+import net.tanesha.recaptcha.ReCaptchaImpl;
+import net.tanesha.recaptcha.ReCaptchaResponse;
 
 /**
  *
@@ -18,16 +22,30 @@ import javax.servlet.http.HttpSession;
 public class ValidateLogin extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         
         String user=request.getParameter("username").trim();
         String pass=request.getParameter("password").trim();
         
+        String remoteAddr = request.getRemoteAddr();
+        ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
+        reCaptcha.setPrivateKey("6LeuvgoUAAAAAN_mo_6pCqKbOMdOOlHyTOI2Jbl1");
+        
+        String challenge = request.getParameter("recaptcha_challenge_field");
+        String uresponse = request.getParameter("recaptcha_response_field");
+        ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(remoteAddr, challenge, uresponse);
+        
+        Boolean captcha = false;
+        if (reCaptchaResponse.isValid()) {
+          captcha = true;
+        }
+
+
         
         try
              {
                  Connection con=new DBConnect().connect(getServletContext().getRealPath("/WEB-INF/config.properties"));
-                 if(con!=null && !con.isClosed())
+                 if(con!=null && !con.isClosed() && captcha)
                                {
                                    ResultSet rs=null;
                                    Statement stmt = con.createStatement(); 
@@ -35,7 +53,7 @@ public class ValidateLogin extends HttpServlet {
                                    //rs=stmt.executeQuery("select * from users where name='"+user+"' and password='"+pass+"'");
                                    pst.setString(1, user);
                                    pst.setString(2, pass);
-                                   pst.executeQuery();
+                                   rs = pst.executeQuery();
                                    if(rs != null && rs.next()){
                                        response.sendRedirect("members.jsp");
                                    } else {
